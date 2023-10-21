@@ -1,19 +1,42 @@
-// components/RegisterScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
 const RegisterScreen = () => {
+  const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = () => {
-    // Tutaj możesz dodać kod do obsługi rejestracji, np. wywołując API rejestracji
-    console.log('Rejestracja...');
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('http://192.168.0.109:3000/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (response.ok) {
+        
+        console.log('Rejestracja zakończona pomyślnie.');
+      } else {
+        const data = await response.json();
+        console.error('Błąd rejestracji:', data.message);
+      }
+    } catch (error) {
+      console.error('Błąd rejestracji:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Rejestracja</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nazwa użytkownika"
+        value={username}
+        onChangeText={setUserName}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"

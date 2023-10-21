@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchCastles = async () => {
       try {
-        const response = await fetch('http://192.168.0.109:3000/castles'); // Zmień URL na odpowiedni adres API
+        const response = await fetch('http://192.168.0.109:3000/castles'); 
         const data = await response.json();
         setCastles(data);
       } catch (error) {
@@ -19,8 +19,8 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   const handleCastlePress = (castle) => {
-    // Tutaj możesz dodać nawigację do ekranu szczegółów zamku
-    // navigation.navigate('CastleDetails', { castle });
+    
+    navigation.navigate('Detail', { castle });
     console.log('Wybrano zamek:', castle.castleName);
   };
 
@@ -30,7 +30,7 @@ const HomeScreen = ({ navigation }) => {
       onPress={() => handleCastlePress(item)}
     >
       <Image
-        source={{ uri: item.castleImages[0] }} // Zakładam, że obrazy zamka są dostępne w tablicy "castleImages"
+        source={{ uri: item.castleImages[0] }} 
         style={styles.castleImage}
       />
       <Text style={styles.castleName}>{item.castleName}</Text>
@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   castleImage: {
-    width: '100%', // Możesz dostosować szerokość obrazu do swoich potrzeb
-    height: 200, // Możesz dostosować wysokość obrazu do swoich potrzeb
+    width: '100%', 
+    height: 200, 
   },
   castleName: {
     fontSize: 18,
