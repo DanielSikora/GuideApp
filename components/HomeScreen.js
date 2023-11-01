@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchCastles = async () => {
       try {
-        const response = await fetch('http://192.168.0.109:3000/castles'); 
+        const response = await fetch('http://192.168.0.111:3000/castles'); 
         const data = await response.json();
         setCastles(data);
       } catch (error) {

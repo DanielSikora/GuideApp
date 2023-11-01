@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
 const RegisterScreen = () => {
-  const [username, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://192.168.0.109:3000/users/register', {
+      const response = await fetch('http://192.168.0.112:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (response.ok) {
@@ -31,12 +30,6 @@ const RegisterScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Rejestracja</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nazwa użytkownika"
-        value={username}
-        onChangeText={setUserName}
-      />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -74,5 +67,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 });
-
 export default RegisterScreen;

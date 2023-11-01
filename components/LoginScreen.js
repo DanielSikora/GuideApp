@@ -5,9 +5,29 @@ const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Tutaj możesz dodać kod do obsługi logowania, np. wywołując API logowania
-    console.log('Logowanie...');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://192.168.0.112:3000/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (response.ok) {
+        // Logowanie powiodło się, możesz obsłużyć token dostępowy lub sesję
+        console.log('Zalogowano pomyślnie');
+      } else {
+        // Logowanie nie powiodło się
+        console.log('Błąd logowania');
+      }
+    } catch (error) {
+      console.error('Wystąpił błąd:', error);
+    }
   };
 
   return (
