@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchCastles = async () => {
       try {
-        const response = await fetch('http://192.168.0.111:3000/castles'); 
+        const response = await fetch('http://192.168.0.105:3000/castles'); 
         const data = await response.json();
         setCastles(data);
       } catch (error) {
@@ -20,7 +20,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleCastlePress = (castle) => {
     
-    navigation.navigate('Detail', { castle });
+    navigation.navigate('DetailScreen', { castle });
     console.log('Wybrano zamek:', castle.castleName);
   };
 
@@ -40,7 +40,6 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Zamki</Text>
       <FlatList
         data={castles}
         keyExtractor={(item) => item._id}

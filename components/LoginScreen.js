@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useContext } from 'react';
+import { AuthContext } from 'GuideApp/App';
 
 const LoginScreen = () => {
+  const { setIsAuthenticated } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigation = useNavigation();
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.112:3000/users/login', {
+      const response = await fetch('http://192.168.0.105:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -20,7 +24,9 @@ const LoginScreen = () => {
 
       if (response.ok) {
         // Logowanie powiodło się, możesz obsłużyć token dostępowy lub sesję
+        setIsAuthenticated(true);
         console.log('Zalogowano pomyślnie');
+        navigation.navigate('HomeScreen');
       } else {
         // Logowanie nie powiodło się
         console.log('Błąd logowania');
@@ -28,6 +34,11 @@ const LoginScreen = () => {
     } catch (error) {
       console.error('Wystąpił błąd:', error);
     }
+  };
+
+  const handleRegister = () => {
+    // Przekieruj użytkownika do ekranu rejestracji
+    navigation.navigate('RegisterScreen');
   };
 
   return (
@@ -47,6 +58,7 @@ const LoginScreen = () => {
         secureTextEntry
       />
       <Button title="Zaloguj się" onPress={handleLogin} />
+      <Button title="Zarejestruj się" onPress={handleRegister} />
     </View>
   );
 };

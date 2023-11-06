@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://192.168.0.112:3000/users/register', {
+      const response = await fetch('http://192.168.0.105:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -16,8 +18,8 @@ const RegisterScreen = () => {
       });
 
       if (response.ok) {
-        
         console.log('Rejestracja zakończona pomyślnie.');
+        navigation.navigate('Auth', { screen: 'LoginScreen' });
       } else {
         const data = await response.json();
         console.error('Błąd rejestracji:', data.message);
@@ -25,6 +27,11 @@ const RegisterScreen = () => {
     } catch (error) {
       console.error('Błąd rejestracji:', error);
     }
+  };
+
+  const handleLogin = () => {
+    // Przekieruj użytkownika do ekranu logowania
+    navigation.navigate('Auth', { screen: 'LoginScreen' });
   };
 
   return (
@@ -44,6 +51,7 @@ const RegisterScreen = () => {
         secureTextEntry
       />
       <Button title="Zarejestruj się" onPress={handleRegister} />
+      <Button title="Zaloguj się" onPress={handleLogin} />
     </View>
   );
 };
@@ -67,4 +75,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 });
+
 export default RegisterScreen;
