@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
 const DetailScreen = ({ route }) => {
   const { castle } = route.params;
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    // Pobieranie komentarzy na podstawie ID zamku
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`http://192.168.0.103:3000/comments/getByCastle/${castle._id}`);
+        const data = await response.json();
+        setComments(data);
+      } catch (error) {
+        console.error('Błąd pobierania komentarzy:', error);
+      }
+    };
+
+    fetchComments();
+  }, [castle.id]);
 
   const openGoogleMaps = () => {
     const { castleLocation } = castle;
@@ -22,6 +38,13 @@ const DetailScreen = ({ route }) => {
       <TouchableOpacity onPress={openGoogleMaps}>
         <Text style={styles.openMapsLink}>Otwórz w Mapach Google</Text>
       </TouchableOpacity>
+
+      {/* Wyświetlanie komentarzy */}
+      <Text style={styles.heading}>Komentarze:</Text>
+{Array.isArray(comments) && comments.map((comment, index) => (
+  <Text key={index}>{comment.text}</Text>
+))}
+
     </ScrollView>
   );
 };
