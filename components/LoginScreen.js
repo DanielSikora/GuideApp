@@ -21,10 +21,15 @@ const LoginScreen = () => {
           password,
         }),
       });
-
+  
       if (response.ok) {
-        // Logowanie powiodło się, możesz obsłużyć token dostępowy lub sesję
-        setIsAuthenticated(true);
+        // Logowanie powiodło się, odczytaj identyfikator użytkownika z odpowiedzi
+        const data = await response.json();
+        const userId = data.userId;
+  
+        // Zapisz identyfikator użytkownika w kontekście autentykacji
+        setIsAuthenticated(true, userId);
+  
         console.log('Zalogowano pomyślnie');
         navigation.navigate('HomeScreen');
       } else {

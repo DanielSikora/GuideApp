@@ -1,37 +1,39 @@
-import React, { createContext, useContext, useReducer } from 'react';
+// AuthContext.js
+import React, { createContext, useContext, useReducer, useState } from 'react';
 
-// Inicjalny stan kontekstu
-const initialState = {
-  isLoggedIn: false,
-};
+// Kontekst oparty na useState
+export const AuthContext = createContext();
 
-// Akcje
-const authReducer = (state, action) => {
-  switch (action.type) {
-    case 'LOGIN':
-      return { isLoggedIn: true };
-    case 'LOGOUT':
-      return { isLoggedIn: false };
-    default:
-      return state;
-  }
-};
-
-// Kontekst autoryzacji
-const AuthContext = createContext();
-
-// Provider autoryzacji
 export function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Reducer do zarządzania stanem autentykacji
+  const [state, dispatch] = useReducer((prevState, action) => {
+    switch (action.type) {
+      case 'SET_AUTH':
+        return { ...prevState, isLoggedIn: action.payload.isLoggedIn, userId: action.payload.userId };
+      case 'LOGOUT':
+        return { ...prevState, isLoggedIn: false, userId: null };
+      default:
+        return prevState;
+    }
+  }, {
+    isLoggedIn: false,
+    userId: null,
+  });
+
+  // Funkcja do ustawiania autentykacji, łącząca obie metody
+  const setCombinedIsAuthenticated = (isLoggedIn, userId) => {
+    setIsAuthenticated(isLoggedIn);
+    dispatch({
+      type: 'SET_AUTH',
+      payload: { isLoggedIn, userId },
+    });
+  };
 
   return (
-    <AuthContext.Provider value={{ state, dispatch }}>
+    <AuthContext.Provider value={{ state, setCombinedIsAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-// Hook do uzyskiwania dostępu do kontekstu autoryzacji
-export function useAuth() {
-  return useContext(AuthContext);
 }
