@@ -4,26 +4,44 @@ import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet } 
 const DetailScreen = ({ route }) => {
   const { castle } = route.params;
   const [comments, setComments] = useState([]);
+  const [userEmails, setUserEmails] = useState([]);
 
   useEffect(() => {
-    // Pobieranie komentarzy na podstawie ID zamku
     const fetchComments = async () => {
       try {
         const response = await fetch(`http://192.168.0.103:3000/comments/getByCastle/${castle._id}`);
         const data = await response.json();
         setComments(data);
+
+        const userIds = data.map((comment) => comment.user._id);
+        const usersResponse = await Promise.all(userIds.map((userId) => fetchUser(userId)));
+        setUserEmails(usersResponse);
       } catch (error) {
         console.error('Błąd pobierania komentarzy:', error);
       }
     };
 
     fetchComments();
-  }, [castle.id]);
+  }, [castle._id]);
 
   const openGoogleMaps = () => {
     const { castleLocation } = castle;
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${castleLocation}`;
     Linking.openURL(googleMapsUrl);
+  };
+
+  const fetchUser = async (userId) => {
+    try {
+      const response = await fetch(`http://192.168.0.103:3000/users/${userId}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const userData = await response.json();
+      return userData.email || 'Nieznany autor';
+    } catch (error) {
+      console.error('Błąd pobierania danych użytkownika:', error);
+      return 'Nieznany autor';
+    }
   };
 
   return (
@@ -39,12 +57,15 @@ const DetailScreen = ({ route }) => {
         <Text style={styles.openMapsLink}>Otwórz w Mapach Google</Text>
       </TouchableOpacity>
 
-      {/* Wyświetlanie komentarzy */}
-      <Text style={styles.heading}>Komentarze:</Text>
-{Array.isArray(comments) && comments.map((comment, index) => (
-  <Text key={index}>{comment.text}</Text>
-))}
-
+      <View style={styles.commentsContainer}>
+        <Text style={styles.heading}>Komentarze:</Text>
+        {comments.map((comment, index) => (
+          <View key={index} style={styles.commentContainer}>
+            <Text style={styles.commentAuthor}>{userEmails[index]}</Text>
+            <Text style={styles.commentText}>{comment.text}</Text>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
@@ -80,6 +101,21 @@ const styles = StyleSheet.create({
     width: 300,
     height: 200,
     marginBottom: 16,
+  },
+  commentAuthor: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: '#555',
+  },
+  commentsContainer: {
+    marginTop: 20,
+  },
+  commentContainer: {
+    marginBottom: 12,
+  },
+  commentText: {
+    fontSize: 14,
+    color: '#333',
   },
 });
 
