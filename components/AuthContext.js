@@ -1,39 +1,60 @@
-// AuthContext.js
-import React, { createContext, useContext, useReducer, useState } from 'react';
+  import React, { createContext, useReducer, useCallback } from 'react';
 
-// Kontekst oparty na useState
-export const AuthContext = createContext();
+  const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Reducer do zarządzania stanem autentykacji
-  const [state, dispatch] = useReducer((prevState, action) => {
-    switch (action.type) {
-      case 'SET_AUTH':
-        return { ...prevState, isLoggedIn: action.payload.isLoggedIn, userId: action.payload.userId };
-      case 'LOGOUT':
-        return { ...prevState, isLoggedIn: false, userId: null };
-      default:
-        return prevState;
-    }
-  }, {
-    isLoggedIn: false,
-    userId: null,
-  });
-
-  // Funkcja do ustawiania autentykacji, łącząca obie metody
-  const setCombinedIsAuthenticated = (isLoggedIn, userId) => {
-    setIsAuthenticated(isLoggedIn);
-    dispatch({
-      type: 'SET_AUTH',
-      payload: { isLoggedIn, userId },
-    });
+  const initialState = {
+    isAuthenticated: false,
   };
 
-  return (
-    <AuthContext.Provider value={{ state, setCombinedIsAuthenticated }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+  const authReducer = (state, action) => {
+    switch (action.type) {
+      case 'LOGIN':
+        return {
+          ...state,
+          isAuthenticated: true,
+          userId: action.payload.userId,
+          userEmail: action.payload.userEmail,
+        };
+      case 'LOGOUT':
+        return {
+          ...state,
+          isAuthenticated: false,
+          userId: null,
+          userEmail: null,
+        };
+      default:
+        return state;
+    }
+  };
+
+  const AuthProvider = ({ children }) => {
+    const [state, dispatch] = useReducer(authReducer, initialState);
+
+
+    const login = useCallback(() => {
+      dispatch({ type: 'LOGIN' });
+    }, []); // Removed dispatch from the dependency array
+
+    const logout = useCallback(() => {
+      dispatch({ type: 'LOGOUT' });
+    }, []); // Removed dispatch from the dependency array
+
+    const contextValue = {
+      state,
+      dispatch,
+      login,
+      logout,
+    };
+
+    return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  };
+
+  const useAuth = () => {
+    const context = React.useContext(AuthContext);
+    if (!context) {
+      throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+  };
+
+  export { AuthContext, AuthProvider, useAuth };

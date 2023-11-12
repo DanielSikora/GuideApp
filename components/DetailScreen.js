@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet, TextInput, Button } from 'react-native';
+import { AuthContext } from './AuthContext'; // Import kontekstu autoryzacji
 
 const DetailScreen = ({ route }) => {
   const { castle } = route.params;
   const [comments, setComments] = useState([]);
   const [userEmails, setUserEmails] = useState([]);
+  const [newComment, setNewComment] = useState(''); // Dodane pole tekstowe dla nowego komentarza
+  const { userId } = useContext(AuthContext); // Pobranie userId z kontekstu autoryzacji
+  const userEmail = route.params?.userEmail || 'Brak danych';
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://192.168.0.103:3000/comments/getByCastle/${castle._id}`);
+        const response = await fetch(`http://192.168.0.110:3000/comments/${castle._id}`);
+        console.log(userEmails);
         const data = await response.json();
         setComments(data);
 
@@ -32,7 +37,7 @@ const DetailScreen = ({ route }) => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`http://192.168.0.103:3000/users/${userId}`);
+      const response = await fetch(`http://192.168.0.110:3000/users/id/${userId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -43,6 +48,46 @@ const DetailScreen = ({ route }) => {
       return 'Nieznany autor';
     }
   };
+
+  const addComment = async () => {
+    try {
+        // Fetch userId2 based on the userEmail
+        console.log('jest email', userEmail);
+        const userResponse = await fetch(`http://192.168.0.110:3000/users/email/${userEmail}`);
+
+        if (!userResponse.ok) {
+            throw new Error('Failed to fetch userId2');
+        }
+
+        const userData = await userResponse.json();
+        const userId2 = userData._id;
+        console.log('jest id', userId2);
+
+        // Now use userId2 to add the comment
+        const response = await fetch(`http://192.168.0.110:3000/comments/`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({  text: newComment, castle: castle._id, user: userId2 }),
+});
+
+console.log('Response status:', response.status);
+console.log('Response body:', await response.text());
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const newCommentData = await response.json();
+        setComments([...comments, newCommentData]);
+        setNewComment('');
+    } catch (error) {
+        console.error('Błąd dodawania komentarza:', error);
+    }
+};
+
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -66,6 +111,15 @@ const DetailScreen = ({ route }) => {
           </View>
         ))}
       </View>
+
+      {/* Dodane pole tekstowe i przycisk do dodawania komentarza */}
+      <TextInput
+        style={styles.newCommentInput}
+        placeholder="Nowy komentarz"
+        value={newComment}
+        onChangeText={(text) => setNewComment(text)}
+      />
+      <Button title="Dodaj komentarz" onPress={addComment} />
     </ScrollView>
   );
 };

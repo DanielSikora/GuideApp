@@ -1,15 +1,68 @@
-import React from 'react';
-import { AuthProvider } from './components/AuthContext';
-
 import { NavigationContainer } from '@react-navigation/native';
-import AppStackNavigator from './components/StackNavigator';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
+import HomeScreen from './components/HomeScreen';
+import { Text, TouchableOpacity, View } from 'react-native';
+import LoginScreen from './components/LoginScreen';
+import RegisterScreen from './components/RegisterScreen';
+import DetailScreen from './components/DetailScreen';
+import { AuthContext, AuthProvider } from './components/AuthContext';
 
-export default function App() {
+
+const Stack = createNativeStackNavigator();
+
+function App() {
   return (
-    <NavigationContainer>
-      <AuthProvider>
-        <AppStackNavigator />
-      </AuthProvider>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="HomeScreen"
+            component={HomeScreen}
+            options={({ navigation }) => ({
+              headerTitle: 'Przewodnik',
+              headerRight: () => (
+                <AuthContext.Consumer>
+                  {({ isAuthenticated, setIsAuthenticated }) => (
+                    <View style={{ flexDirection: 'row', marginRight: 10 }}>
+                      {isAuthenticated ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            // Po wylogowaniu
+                            setIsAuthenticated(false);
+                          }}
+                          style={{ marginRight: 10 }}
+                        >
+                          <Text>Wyloguj</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('LoginScreen')}
+                          style={{ marginRight: 10 }}
+                        >
+                          <Text>Zaloguj</Text>
+                        </TouchableOpacity>
+                      )}
+                      {!isAuthenticated ? (
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('RegisterScreen')}
+                        >
+                          <Text>Zarejestruj</Text>
+                        </TouchableOpacity>
+                      ) : null}
+                    </View>
+                  )}
+                </AuthContext.Consumer>
+              ),
+            })}
+          />
+          <Stack.Screen name="LoginScreen" component={LoginScreen} />
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+          <Stack.Screen name="DetailScreen" component={DetailScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
+
+export default App;

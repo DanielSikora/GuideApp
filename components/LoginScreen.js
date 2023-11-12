@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useContext } from 'react';
-import { AuthContext } from 'GuideApp/App';
+import { useAuth } from './AuthContext';
 
 const LoginScreen = () => {
-  const { setIsAuthenticated } = useContext(AuthContext);
+  const { dispatch } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://192.168.0.103:3000/users/login', {
+      // Pobierz e-mail z pola tekstowego
+      console.log('Wprowadzony Email:', email);
+
+      const response = await fetch('http://192.168.0.110:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,19 +26,24 @@ const LoginScreen = () => {
       });
   
       if (response.ok) {
-        // Logowanie powiodło się, odczytaj identyfikator użytkownika z odpowiedzi
         const data = await response.json();
+        console.log('Odpowiedź od serwera:', data);
+
         const userId = data.userId;
-  
-        // Zapisz identyfikator użytkownika w kontekście autentykacji
-        setIsAuthenticated(true, userId);
-  
-        console.log('Zalogowano pomyślnie');
-        navigation.navigate('HomeScreen');
+        const userEmail = email;
+
+        console.log('UserId:', userId);
+        console.log('UserEmail:', userEmail);
+
+        // Zapisz identyfikator użytkownika, adres e-mail i zaloguj
+        dispatch({ type: 'LOGIN', payload: { userId, userEmail } });
+      
+        console.log('Zalogowano pomyślnie. Identyfikator użytkownika:', userEmail);
+        navigation.navigate('HomeScreen', { userEmail });
       } else {
-        // Logowanie nie powiodło się
         console.log('Błąd logowania');
       }
+      
     } catch (error) {
       console.error('Wystąpił błąd:', error);
     }
