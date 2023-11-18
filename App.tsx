@@ -8,7 +8,6 @@ import RegisterScreen from './components/RegisterScreen';
 import DetailScreen from './components/DetailScreen';
 import { AuthContext, AuthProvider } from './components/AuthContext';
 
-
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -23,9 +22,9 @@ function App() {
               headerTitle: 'Przewodnik',
               headerRight: () => (
                 <AuthContext.Consumer>
-                  {({ isAuthenticated, setIsAuthenticated }) => (
+                  {({ state, setIsAuthenticated }) => (
                     <View style={{ flexDirection: 'row', marginRight: 10 }}>
-                      {isAuthenticated ? (
+                      {state.isAuthenticated ? (
                         <TouchableOpacity
                           onPress={() => {
                             // Po wylogowaniu
@@ -35,15 +34,16 @@ function App() {
                         >
                           <Text>Wyloguj</Text>
                         </TouchableOpacity>
-                      ) : (
+                      ) : null}
+                      {!state.isAuthenticated ? (
                         <TouchableOpacity
                           onPress={() => navigation.navigate('LoginScreen')}
                           style={{ marginRight: 10 }}
                         >
                           <Text>Zaloguj</Text>
                         </TouchableOpacity>
-                      )}
-                      {!isAuthenticated ? (
+                      ) : null}
+                      {!state.isAuthenticated ? (
                         <TouchableOpacity
                           onPress={() => navigation.navigate('RegisterScreen')}
                         >

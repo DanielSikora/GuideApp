@@ -1,24 +1,26 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet, TextInput, Button } from 'react-native';
-import { AuthContext } from './AuthContext'; // Import kontekstu autoryzacji
+import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet, TextInput, Button, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const DetailScreen = ({ route }) => {
   const { castle } = route.params;
   const [comments, setComments] = useState([]);
   const [userEmails, setUserEmails] = useState([]);
-  const [newComment, setNewComment] = useState(''); // Dodane pole tekstowe dla nowego komentarza
-  const { userId } = useContext(AuthContext); // Pobranie userId z kontekstu autoryzacji
+  const [newComment, setNewComment] = useState('');
+  const navigation = useNavigation();
   const userEmail = route.params?.userEmail || 'Brak danych';
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://192.168.0.110:3000/comments/${castle._id}`);
+        const response = await fetch(`http://192.168.0.105:3000/comments/${castle._id}`);
         console.log(userEmails);
         const data = await response.json();
         setComments(data);
 
-        const userIds = data.map((comment) => comment.user._id);
+        const userIds = data.map((comment) => comment.user);
         const usersResponse = await Promise.all(userIds.map((userId) => fetchUser(userId)));
         setUserEmails(usersResponse);
       } catch (error) {
@@ -27,7 +29,9 @@ const DetailScreen = ({ route }) => {
     };
 
     fetchComments();
-  }, [castle._id]);
+  }, [castle._id, comments]);
+
+  
 
   const openGoogleMaps = () => {
     const { castleLocation } = castle;
@@ -37,7 +41,7 @@ const DetailScreen = ({ route }) => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`http://192.168.0.110:3000/users/id/${userId}`);
+      const response = await fetch(`http://192.168.0.105:3000/users/id/${userId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -48,12 +52,12 @@ const DetailScreen = ({ route }) => {
       return 'Nieznany autor';
     }
   };
-
-  const addComment = async () => {
+  
+  const addComment = async (navigation) => {
     try {
         // Fetch userId2 based on the userEmail
         console.log('jest email', userEmail);
-        const userResponse = await fetch(`http://192.168.0.110:3000/users/email/${userEmail}`);
+        const userResponse = await fetch(`http://192.168.0.105:3000/users/email/${userEmail}`);
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch userId2');
@@ -64,27 +68,34 @@ const DetailScreen = ({ route }) => {
         console.log('jest id', userId2);
 
         // Now use userId2 to add the comment
-        const response = await fetch(`http://192.168.0.110:3000/comments/`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({  text: newComment, castle: castle._id, user: userId2 }),
-});
+        const response = await fetch(`http://192.168.0.105:3000/comments/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: newComment, castle: castle._id, user: userId2 }),
+    });
 
-console.log('Response status:', response.status);
-console.log('Response body:', await response.text());
+    console.log('Response status:', response.status);
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const newCommentData = await response.json();
-        setComments([...comments, newCommentData]);
-        setNewComment('');
-    } catch (error) {
-        console.error('Błąd dodawania komentarza:', error);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
+
+    const responseData = await response.json(); // Read the response once
+
+    console.log('Response body:', responseData);
+
+    setComments([...comments, responseData]);
+    setNewComment('');  
+    
+    Alert.alert('Komentarz dodany', 'Twój komentarz został dodany pomyślnie.');
+    // Fetch comments again after adding a new one
+    
+
+  } catch (error) {
+    console.error('Błąd dodawania komentarza:', error);
+  }
 };
 
   
@@ -101,7 +112,6 @@ console.log('Response body:', await response.text());
       <TouchableOpacity onPress={openGoogleMaps}>
         <Text style={styles.openMapsLink}>Otwórz w Mapach Google</Text>
       </TouchableOpacity>
-
       <View style={styles.commentsContainer}>
         <Text style={styles.heading}>Komentarze:</Text>
         {comments.map((comment, index) => (
@@ -111,15 +121,13 @@ console.log('Response body:', await response.text());
           </View>
         ))}
       </View>
-
-      {/* Dodane pole tekstowe i przycisk do dodawania komentarza */}
       <TextInput
         style={styles.newCommentInput}
         placeholder="Nowy komentarz"
         value={newComment}
         onChangeText={(text) => setNewComment(text)}
       />
-      <Button title="Dodaj komentarz" onPress={addComment} />
+      <Button title="Dodaj komentarz" onPress={() => addComment(navigation)} />
     </ScrollView>
   );
 };

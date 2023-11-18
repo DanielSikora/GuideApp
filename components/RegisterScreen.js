@@ -9,7 +9,7 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://192.168.0.103:3000/users/register', {
+      const response = await fetch('http://192.168.0.105:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ const RegisterScreen = () => {
 
       if (response.ok) {
         console.log('Rejestracja zakończona pomyślnie.');
-        navigation.navigate('Auth', { screen: 'LoginScreen' });
+        navigation.navigate('LoginScreen');
       } else {
         const data = await response.json();
         console.error('Błąd rejestracji:', data.message);
@@ -31,7 +31,7 @@ const RegisterScreen = () => {
 
   const handleLogin = () => {
     // Przekieruj użytkownika do ekranu logowania
-    navigation.navigate('Auth', { screen: 'LoginScreen' });
+    navigation.navigate('LoginScreen');
   };
 
   return (

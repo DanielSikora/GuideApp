@@ -14,7 +14,7 @@ const LoginScreen = () => {
       // Pobierz e-mail z pola tekstowego
       console.log('Wprowadzony Email:', email);
 
-      const response = await fetch('http://192.168.0.110:3000/users/login', {
+      const response = await fetch('http://192.168.0.105:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
