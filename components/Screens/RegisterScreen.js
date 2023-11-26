@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import styles from './Styles/RegisterScreenStyles';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');
@@ -9,7 +10,7 @@ const RegisterScreen = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://192.168.0.105:3000/users/register', {
+      const response = await fetch('http://192.168.0.110:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,7 +31,6 @@ const RegisterScreen = () => {
   };
 
   const handleLogin = () => {
-    // Przekieruj użytkownika do ekranu logowania
     navigation.navigate('LoginScreen');
   };
 
@@ -50,30 +50,14 @@ const RegisterScreen = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Zarejestruj się" onPress={handleRegister} />
-      <Button title="Zaloguj się" onPress={handleLogin} />
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>Zarejestruj się</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Zaloguj się</Text>
+      </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  heading: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  input: {
-    width: '80%',
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-});
 
 export default RegisterScreen;

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet, TextInput, Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import styles from './Styles/DetailScreenStyles';
 
 
 
@@ -15,8 +16,8 @@ const DetailScreen = ({ route }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://192.168.0.105:3000/comments/${castle._id}`);
-        console.log(userEmails);
+        const response = await fetch(`http://192.168.0.110:3000/comments/${castle._id}`);
+        
         const data = await response.json();
         setComments(data);
 
@@ -41,7 +42,7 @@ const DetailScreen = ({ route }) => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`http://192.168.0.105:3000/users/id/${userId}`);
+      const response = await fetch(`http://192.168.0.110:3000/users/id/${userId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -55,9 +56,8 @@ const DetailScreen = ({ route }) => {
   
   const addComment = async (navigation) => {
     try {
-        // Fetch userId2 based on the userEmail
         console.log('jest email', userEmail);
-        const userResponse = await fetch(`http://192.168.0.105:3000/users/email/${userEmail}`);
+        const userResponse = await fetch(`http://192.168.0.110:3000/users/email/${userEmail}`);
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch userId2');
@@ -67,8 +67,8 @@ const DetailScreen = ({ route }) => {
         const userId2 = userData._id;
         console.log('jest id', userId2);
 
-        // Now use userId2 to add the comment
-        const response = await fetch(`http://192.168.0.105:3000/comments/`, {
+        
+        const response = await fetch(`http://192.168.0.110:3000/comments/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,15 +82,15 @@ const DetailScreen = ({ route }) => {
       throw new Error('Network response was not ok');
     }
 
-    const responseData = await response.json(); // Read the response once
+    const responseData = await response.json();
 
-    console.log('Response body:', responseData);
+    
 
     setComments([...comments, responseData]);
     setNewComment('');  
     
     Alert.alert('Komentarz dodany', 'Twój komentarz został dodany pomyślnie.');
-    // Fetch comments again after adding a new one
+  
     
 
   } catch (error) {
@@ -102,11 +102,14 @@ const DetailScreen = ({ route }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.castleName}>{castle.castleName}</Text>
-      <Text style={styles.heading}>Zdjęcia zamku:</Text>
-      {castle.castleImages.map((image, index) => (
-        <Image source={{ uri: image }} style={styles.image} key={index} />
-      ))}
+  <Text style={styles.castleName}>{castle.castleName}</Text>
+  <Text style={styles.heading}>Zdjęcia zamku:</Text>
+  {castle.castleImages.map((image, index) => {
+    if (image.trim() !== '') {
+      return <Image source={{ uri: image }} style={styles.image} key={index} />;
+    }
+    return null; 
+  })}
       <Text style={styles.castleDescription}>{castle.castleDescription}</Text>
       <Text style={styles.location}>Lokalizacja: {castle.castleLocation}</Text>
       <TouchableOpacity onPress={openGoogleMaps}>
@@ -131,54 +134,5 @@ const DetailScreen = ({ route }) => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  castleName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  castleDescription: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  location: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  openMapsLink: {
-    fontSize: 16,
-    color: 'blue',
-    marginBottom: 16,
-    textDecorationLine: 'underline',
-  },
-  heading: {
-    fontSize: 18,
-    marginBottom: 8,
-  },
-  image: {
-    width: 300,
-    height: 200,
-    marginBottom: 16,
-  },
-  commentAuthor: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: '#555',
-  },
-  commentsContainer: {
-    marginTop: 20,
-  },
-  commentContainer: {
-    marginBottom: 12,
-  },
-  commentText: {
-    fontSize: 14,
-    color: '#333',
-  },
-});
 
 export default DetailScreen;
