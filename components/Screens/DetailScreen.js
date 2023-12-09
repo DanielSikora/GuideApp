@@ -1,7 +1,10 @@
-import React, { useState, useEffect} from 'react';
-import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet, TextInput, Button, Alert } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, Image, Linking, TouchableOpacity, ScrollView, StyleSheet, TextInput, Button, Alert, FlatList  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './Styles/DetailScreenStyles';
+import { useAuth } from '../AuthContext';
+
+
 
 
 
@@ -11,12 +14,13 @@ const DetailScreen = ({ route }) => {
   const [userEmails, setUserEmails] = useState([]);
   const [newComment, setNewComment] = useState('');
   const navigation = useNavigation();
+  const { isAuthenticated, user } = useAuth();
   const userEmail = route.params?.userEmail || 'Brak danych';
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://192.168.0.110:3000/comments/${castle._id}`);
+        const response = await fetch(`http://192.168.0.104:3000/comments/${castle._id}`);
         
         const data = await response.json();
         setComments(data);
@@ -42,7 +46,7 @@ const DetailScreen = ({ route }) => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`http://192.168.0.110:3000/users/id/${userId}`);
+      const response = await fetch(`http://192.168.0.104:3000/users/id/${userId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -57,7 +61,7 @@ const DetailScreen = ({ route }) => {
   const addComment = async (navigation) => {
     try {
         console.log('jest email', userEmail);
-        const userResponse = await fetch(`http://192.168.0.110:3000/users/email/${userEmail}`);
+        const userResponse = await fetch(`http://192.168.0.104:3000/users/email/${userEmail}`);
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch userId2');
@@ -68,7 +72,7 @@ const DetailScreen = ({ route }) => {
         console.log('jest id', userId2);
 
         
-        const response = await fetch(`http://192.168.0.110:3000/comments/`, {
+        const response = await fetch(`http://192.168.0.104:3000/comments/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -101,15 +105,22 @@ const DetailScreen = ({ route }) => {
   
 
   return (
+    <View style={styles.screenBackground}>
     <ScrollView contentContainerStyle={styles.container}>
   <Text style={styles.castleName}>{castle.castleName}</Text>
   <Text style={styles.heading}>Zdjęcia zamku:</Text>
-  {castle.castleImages.map((image, index) => {
-    if (image.trim() !== '') {
-      return <Image source={{ uri: image }} style={styles.image} key={index} />;
+  <FlatList
+  data={castle.castleImages}
+  horizontal
+  showsHorizontalScrollIndicator={false}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => {
+    if (item.trim() !== '') {
+      return <Image source={{ uri: item }} style={styles.image} />;
     }
-    return null; 
-  })}
+    return null;
+  }}
+/>
       <Text style={styles.castleDescription}>{castle.castleDescription}</Text>
       <Text style={styles.location}>Lokalizacja: {castle.castleLocation}</Text>
       <TouchableOpacity onPress={openGoogleMaps}>
@@ -124,14 +135,23 @@ const DetailScreen = ({ route }) => {
           </View>
         ))}
       </View>
-      <TextInput
-        style={styles.newCommentInput}
-        placeholder="Nowy komentarz"
-        value={newComment}
-        onChangeText={(text) => setNewComment(text)}
-      />
-      <Button title="Dodaj komentarz" onPress={() => addComment(navigation)} />
+      {isAuthenticated && ( // Warunek renderowania tylko dla zalogowanego użytkownika
+        <View>
+          <TextInput
+            style={styles.newCommentInput}
+            placeholder="Nowy komentarz"
+            value={newComment}
+            onChangeText={(text) => setNewComment(text)}
+          />
+          <View style={styles.buttonContainer}>
+  <TouchableOpacity style={styles.button} onPress={() => addComment(navigation)}>
+    <Text style={styles.buttonText}>Dodaj komentarz</Text>
+  </TouchableOpacity>
+</View>
+        </View>
+      )}
     </ScrollView>
+    </View>
   );
 };
 

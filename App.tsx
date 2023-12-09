@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import HomeScreen from './components/Screens/HomeScreen';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View, Alert } from 'react-native';
 import LoginScreen from './components/Screens/LoginScreen';
 import RegisterScreen from './components/Screens/RegisterScreen';
 import DetailScreen from './components/Screens/DetailScreen';
@@ -30,14 +30,17 @@ function App() {
           <View style={{ flexDirection: 'row', marginRight: 10 }}>
             {state.isAuthenticated ? (
               <TouchableOpacity
-                onPress={() => {
-                  // Po wylogowaniu
-                  setIsAuthenticated(false);
-                }}
-                style={[styles.authButton, { marginRight: 10 }]} // Dodane styles.authButton
-              >
-                <Text style={styles.authButtonText}>Wyloguj</Text>
-              </TouchableOpacity>
+              onPress={() => {
+                setIsAuthenticated(false);
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'HomeScreen' }],
+                });
+              }}
+              style={[styles.authButton, { marginRight: 10 }]}
+            >
+              <Text style={styles.authButtonText}>Wyloguj</Text>
+            </TouchableOpacity>
             ) : null}
             {!state.isAuthenticated ? (
               <TouchableOpacity

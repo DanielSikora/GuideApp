@@ -17,6 +17,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
     marginBottom: 10,
     paddingHorizontal: 10,
   },
