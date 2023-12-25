@@ -17,7 +17,7 @@ const LoginScreen = () => {
     try {
       console.log('Wprowadzony Email:', email);
 
-      const response = await fetch('http://192.168.0.104:3000/users/login', {
+      const response = await fetch('http://192.168.0.108:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

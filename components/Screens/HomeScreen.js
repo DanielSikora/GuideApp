@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, FlatList, TouchableWithoutFeedback, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, FlatList, TouchableWithoutFeedback, TextInput, TouchableOpacity } from 'react-native';
 import styles from './Styles/HomeScreenStyles';
 
 
@@ -12,7 +12,7 @@ const HomeScreen = ({ navigation, route }) => {
   useEffect(() => {
     const fetchCastles = async () => {
       try {
-        const response = await fetch('http://192.168.0.104:3000/castles');
+        const response = await fetch('http://192.168.0.108:3000/castles');
         const data = await response.json();
         setCastles(data);
       } catch (error) {

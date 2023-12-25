@@ -20,7 +20,7 @@ const DetailScreen = ({ route }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://192.168.0.104:3000/comments/${castle._id}`);
+        const response = await fetch(`http://192.168.0.108:3000/comments/${castle._id}`);
         
         const data = await response.json();
         setComments(data);
@@ -46,7 +46,7 @@ const DetailScreen = ({ route }) => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`http://192.168.0.104:3000/users/id/${userId}`);
+      const response = await fetch(`http://192.168.0.108:3000/users/id/${userId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -61,7 +61,7 @@ const DetailScreen = ({ route }) => {
   const addComment = async (navigation) => {
     try {
         console.log('jest email', userEmail);
-        const userResponse = await fetch(`http://192.168.0.104:3000/users/email/${userEmail}`);
+        const userResponse = await fetch(`http://192.168.0.108:3000/users/email/${userEmail}`);
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch userId2');
@@ -72,7 +72,7 @@ const DetailScreen = ({ route }) => {
         console.log('jest id', userId2);
 
         
-        const response = await fetch(`http://192.168.0.104:3000/comments/`, {
+        const response = await fetch(`http://192.168.0.108:3000/comments/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -116,16 +116,23 @@ const DetailScreen = ({ route }) => {
   keyExtractor={(item, index) => index.toString()}
   renderItem={({ item }) => {
     if (item.trim() !== '') {
-      return <Image source={{ uri: item }} style={styles.image} />;
+      return <View>
+      <Image source={{ uri: item }} style={styles.image} />
+      <Text style={styles.imageAuthor}>
+        Autor zdjęcia: {castle.imageAuthor}
+      </Text>
+    </View>;
     }
     return null;
   }}
 />
       <Text style={styles.castleDescription}>{castle.castleDescription}</Text>
       <Text style={styles.location}>Lokalizacja: {castle.castleLocation}</Text>
+      {isAuthenticated && (
       <TouchableOpacity onPress={openGoogleMaps}>
         <Text style={styles.openMapsLink}>Otwórz w Mapach Google</Text>
       </TouchableOpacity>
+      )}
       <View style={styles.commentsContainer}>
         <Text style={styles.heading}>Komentarze:</Text>
         {comments.map((comment, index) => (
