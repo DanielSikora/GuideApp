@@ -88,6 +88,16 @@ const styles = StyleSheet.create({
     color: 'black', // Zmiana koloru tekstu na biały dla lepszej czytelności
     fontSize: 16,
   },
+  deleteButton: {
+    backgroundColor: 'red', // Ustawienie koloru czerwonego dla tła przycisku
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  deleteButtonText: {
+    color: 'white', // Kolor tekstu na przycisku
+    textAlign: 'center',
+  },
 });
 
 export default styles;
