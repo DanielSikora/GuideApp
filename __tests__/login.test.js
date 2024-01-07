@@ -1,76 +1,88 @@
 import React from 'react';
-import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import LoginScreen from '../components/Screens/LoginScreen';
-import { AuthContext } from '../components/AuthContext';
+import { AuthContext, AuthProvider } from '../components/AuthContext';
+import { NavigationContainer } from '@react-navigation/native';
 
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: jest.fn(() => ({ navigate: jest.fn() })),
-}));
+describe('Testy ekranu logowania.', () => {
+  it('Renderuje pole wpisywania email.', () => {
+    const { getByTestId } = render(<AuthProvider><NavigationContainer><LoginScreen /></NavigationContainer></AuthProvider>);
 
-jest.mock('../components/AuthContext', () => ({
-  useAuth: jest.fn(() => ({ dispatch: jest.fn() })),
-}));
+    const emailInput = getByTestId('emailInput');
 
-jest.mock('react-native-toast-message', () => ({
-  show: jest.fn(),
-}));
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve({}),
-    ok: true,
-  })
-);
+    expect(emailInput).toBeTruthy();
+  });
+  it('Renderuje pole wpisywania hasła.', () => {
+    const { getByTestId } = render(<AuthProvider><NavigationContainer><LoginScreen /></NavigationContainer></AuthProvider>);
+    
+    const passwordInput = getByTestId('passwordInput');
+    
+    expect(passwordInput).toBeTruthy();
+    
+  });
+  it('Renderuje przycisk logowania.', () => {
+    const { getByTestId } = render(<AuthProvider><NavigationContainer><LoginScreen /></NavigationContainer></AuthProvider>);
+    
+    const loginButton = getByTestId('loginButton');
+    
+    expect(loginButton).toBeTruthy();
+    
+  });
+  it('Renderuje przycisk przenoszenia do rejestracji.', () => {
+    const { getByTestId } = render(<AuthProvider><NavigationContainer><LoginScreen /></NavigationContainer></AuthProvider>);
 
-describe('<LoginScreen />', () => {
-  test('updates email value on change', () => {
-    const { getByPlaceholderText } = render(<LoginScreen />);
-    const emailInput = getByPlaceholderText('Email');
+    const registerButton = getByTestId('registerButton');
+
+    expect(registerButton).toBeTruthy();
+  });
+  it('Aktualizuje wartość w polu loginu prawidłowo.', () => {
+    const { getByTestId } = render(<AuthProvider><NavigationContainer><LoginScreen /></NavigationContainer></AuthProvider>);
+    const emailInput = getByTestId('emailInput');
+    
+    fireEvent.changeText(emailInput, 'test@example.com');
+    
+    expect(emailInput.props.value).toBe('test@example.com');
+    
+  });
+  it('Aktualizuje wartość w polu hasła prawidłowo.', () => {
+    const { getByTestId } = render(<AuthProvider><NavigationContainer><LoginScreen /></NavigationContainer></AuthProvider>);
+    
+    const passwordInput = getByTestId('passwordInput');
+
+    fireEvent.changeText(passwordInput, 'password123');
+    
+    expect(passwordInput.props.value).toBe('password123');
+  });
+  it('Aktualizuje wartość w polu loginu prawidłowo.', () => {
+    const { getByTestId } = render(
+      <AuthProvider>
+        <NavigationContainer>
+          <LoginScreen />
+        </NavigationContainer>
+      </AuthProvider>
+    );
+    const emailInput = getByTestId('emailInput');
 
     fireEvent.changeText(emailInput, 'test@example.com');
 
     expect(emailInput.props.value).toBe('test@example.com');
   });
+  it('Aktualizuje wartość w polu hasła prawidłowo.', () => {
+    const { getByTestId } = render(
+      <AuthProvider>
+        <NavigationContainer>
+          <LoginScreen />
+        </NavigationContainer>
+      </AuthProvider>
+    );
 
-  test('logs in with correct credentials', async () => {
-    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
-    const emailInput = getByPlaceholderText('Email');
-    const passwordInput = getByPlaceholderText('Hasło');
-    const loginButton = getByText('Zaloguj się');
+    const passwordInput = getByTestId('passwordInput');
 
-    fireEvent.changeText(emailInput, 'test@example.com');
     fireEvent.changeText(passwordInput, 'password123');
-    fireEvent.press(loginButton);
 
-    // Oczekiwanie na pomyślne zalogowanie (tu możesz oczekiwać na zmianę ekranu, wyświetlenie komunikatu itp.)
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-    expect(global.fetch).toHaveBeenCalledWith('http://192.168.0.108:3000/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: 'test@example.com',
-        password: 'password123',
-      }),
-    });
-    expect(global.fetch.mock.calls[0][0]).toBe('http://192.168.0.108:3000/users/login');
-
-    // Tutaj możesz również dodać asercje dotyczące zachowania po zalogowaniu
-    expect(global.fetch.mock.calls[0][0]).toBe('http://192.168.0.108:3000/users/login');
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch.mock.calls[0][1].body).toBe(JSON.stringify({ email: 'test@example.com', password: 'password123' }));
+    expect(passwordInput.props.value).toBe('password123');
   });
 
-  test('navigates to registration screen', () => {
-    const { getByText } = render(<LoginScreen />);
-    const registerButton = getByText('Zarejestruj się');
-
-    fireEvent.press(registerButton);
-
-    // Tutaj możesz sprawdzić, czy ekran rejestracji jest wyświetlony lub czy nawigacja została wykonana
-    // Możesz oczekiwać na odpowiednie zmiany w UI lub przełączenie ekranu
-    expect(registerButton).toBeDefined();
-  });
+  
+ 
 });

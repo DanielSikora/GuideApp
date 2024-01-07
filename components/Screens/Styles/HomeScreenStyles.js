@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   randomCastleButton: {
     backgroundColor: 'darkgray',
-    fontSize: 16,
+    fontSize: 14,
     color: 'black',
     borderRadius: 5,
     justifyContent: 'center',

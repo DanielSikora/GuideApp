@@ -36,7 +36,7 @@ const RegisterScreen = () => {
         return;
       }
 
-      const response = await fetch('http://192.168.0.108:3000/users/register', {
+      const response = await fetch('http://192.168.0.112:3000/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,6 +72,7 @@ const RegisterScreen = () => {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        testID="emailInput"
       />
       <TextInput
         style={styles.input}
@@ -79,6 +80,7 @@ const RegisterScreen = () => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        testID="passwordInput1"
       />
       <TextInput
         style={styles.input}
@@ -86,11 +88,12 @@ const RegisterScreen = () => {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
+        testID="passwordInput2"
       />
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+      <TouchableOpacity testID="registerButton" style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Zarejestruj się</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity testID="loginButton" style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Zaloguj się</Text>
       </TouchableOpacity>
       

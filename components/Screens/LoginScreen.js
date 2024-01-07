@@ -3,7 +3,7 @@ import { View, Text, TextInput, Alert,  TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../AuthContext';
 import styles from './Styles/LoginScreenStyles';
-import Toast from 'react-native-toast-message'; 
+ 
 console.warn = () => {};
 const LoginScreen = () => {
   const { dispatch } = useAuth();
@@ -17,7 +17,7 @@ const LoginScreen = () => {
     try {
       console.log('Wprowadzony Email:', email);
 
-      const response = await fetch('http://192.168.0.108:3000/users/login', {
+      const response = await fetch('http://192.168.0.112:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,11 +43,7 @@ const LoginScreen = () => {
         console.log('Zalogowano pomyślnie. Identyfikator użytkownika:', userEmail);
         navigation.navigate('HomeScreen', { userEmail });
 
-        Toast.show({
-          type: 'success',
-          text1: 'Zalogowano pomyślnie',
-          visibilityTime: 3000,
-        });
+        
       } else {
         const errorData = await response.json();
         Alert.alert('Błąd', 'Nieprawidłowy email lub hasło.');
@@ -63,28 +59,38 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Logowanie</Text>
-<TextInput
-  style={styles.input}
-  placeholder="Email"
-  value={email}
-  onChangeText={setEmail}
-/>
-<TextInput
-  style={styles.input}
-  placeholder="Hasło"
-  value={password}
-  onChangeText={setPassword}
-  secureTextEntry
-/>
-<TouchableOpacity style={styles.button} onPress={handleLogin}>
-  <Text style={styles.buttonText}>Zaloguj się</Text>
-</TouchableOpacity>
-<TouchableOpacity style={styles.button} onPress={handleRegister}>
-  <Text style={styles.buttonText}>Zarejestruj się</Text>
-</TouchableOpacity>
-    </View>
+    <View style={styles.container} testID="loginScreen">
+    <Text style={styles.heading}>Logowanie</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Email"
+      value={email}
+      onChangeText={setEmail}
+      testID="emailInput"
+    />
+    <TextInput
+      style={styles.input}
+      placeholder="Hasło"
+      value={password}
+      onChangeText={setPassword}
+      secureTextEntry
+      testID="passwordInput"
+    />
+    <TouchableOpacity
+      style={styles.button}
+      onPress={handleLogin}
+      testID="loginButton"
+    >
+      <Text style={styles.buttonText}>Zaloguj się</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={handleRegister}
+      testID="registerButton"
+    >
+      <Text style={styles.buttonText}>Zarejestruj się</Text>
+    </TouchableOpacity>
+  </View>
   );
 };
 
